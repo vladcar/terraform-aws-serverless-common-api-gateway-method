@@ -45,7 +45,11 @@ resource "aws_api_gateway_integration" "integration" {
   request_templates  = var.mapping_templates
 }
 
-# default '202 Accepted' method response. Use for async lambda integration
+###################################################################
+############## Async integration ##################################
+###################################################################
+
+# default 'OK' method response. Use for async lambda integration
 resource "aws_api_gateway_method_response" "response_ok" {
   count = var.enable_async_lambda_integration ? 1 : 0
 
@@ -53,9 +57,15 @@ resource "aws_api_gateway_method_response" "response_ok" {
   resource_id = var.resource_id
   http_method = aws_api_gateway_method.method.http_method
   status_code = var.async_response_status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true,
+    "method.response.header.Access-Control-Allow-Methods" = true,
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
 }
 
-# default '202 Accepted' integration response. Use for async lambda integration
+# default 'OK' integration response. Use for async lambda integration
 resource "aws_api_gateway_integration_response" "integration_response" {
   count      = var.enable_async_lambda_integration ? 1 : 0
   depends_on = [aws_api_gateway_integration.integration]
@@ -67,4 +77,10 @@ resource "aws_api_gateway_integration_response" "integration_response" {
 
   # default selection pattern - more info: https://www.terraform.io/docs/providers/aws/r/api_gateway_integration_response.html#selection_pattern
   selection_pattern = "-"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,PATCH,DELETE'",
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
 }
