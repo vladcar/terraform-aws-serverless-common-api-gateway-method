@@ -28,6 +28,27 @@ variable "api_key_required" {
   default = false
 }
 
+variable "cors_allow_headers" {
+  type        = list(string)
+  description = "Comma separated list of allowed headers"
+  default = [
+    "Content-Type",
+    "X-Amz-Date",
+    "Authorization",
+    "X-Api-Key",
+    "X-Amz-Security-Token",
+    "X-Token"
+  ]
+}
+
+variable "cors_allow_methods" {
+  type        = list(string)
+  description = "Comma separated list of allowed methods"
+  default = [
+    "GET", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"
+  ]
+}
+
 # integration with Lambda function
 variable "integration_http_method" {
   type    = string
